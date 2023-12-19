@@ -93,8 +93,7 @@ def downloadFile(conn: socket.socket, filename: str, verbose=False):
 
             if verbose: print("[+] compare MD5s")
             hasher.update(bChunk)
-            m_HashDigest = hasher.hexdigest()
-            if m_HashDigest != downloaded_md5Hash:
+            if (m_HashDigest := hasher.hexdigest()) != downloaded_md5Hash:
                 raise IOError(f"[ERROR] MD5 values don't match, \nm: {m_HashDigest}\nd: {downloaded_md5Hash}")
             
             if verbose: print("[+] send MD5 from received bytes")
@@ -116,8 +115,7 @@ def uploadFile(conn: socket.socket, filename: str, verbose=False):
     """
     Upload file using on buffer size
     """
-    res = recvResponse(conn)
-    if res == "1":
+    if (res := recvResponse(conn)) == "1":
         if verbose: print("[+] sending file size")
         filesize = os.path.getsize(filename)
         conn.sendall(f"{filesize:<{BUFFER_LG}}".encode())
@@ -136,8 +134,7 @@ def uploadFile(conn: socket.socket, filename: str, verbose=False):
                 chunkSize = str(len(bChunk))
                 size_msg = f"{chunkSize:<{BUFFER_SM}}".encode()
                 conn.sendall(size_msg)
-                res = recvResponse(conn)
-                if res != "1": return # did not receive chunk size
+                if (res := recvResponse(conn)) != "1": return # did not receive chunk size
 
                 if verbose: print("[+] sending chunk")
                 conn.sendall(bChunk)
@@ -149,8 +146,7 @@ def uploadFile(conn: socket.socket, filename: str, verbose=False):
                 # print(hasher.hexdigest())
 
                 if verbose: print("[+] recevie and compare downloader's MP5Hash for chunk")
-                receiver_md5Hash = conn.recv(32).decode()
-                if receiver_md5Hash != hasher.hexdigest():
+                if (receiver_md5Hash := conn.recv(32).decode()) != hasher.hexdigest():
                     raise IOError("Receiver received incorrect data")
 
                 sent_size += int(chunkSize)

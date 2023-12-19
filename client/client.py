@@ -71,9 +71,8 @@ def part2 ():
     conn.connect(sin)
 
     while True:
-        command = input("> ")
 
-        if command == "QUIT":
+        if (command := input("> ")) == "QUIT":
             send_op_and_arg(conn, command[:4])
             break
 
